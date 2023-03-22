@@ -1,30 +1,36 @@
 <script>
-	export let name;
+	let type = 'feat';
+	let issueNo = '';
+	let message = '';
+
+	$: result = `${type}(${issueNo}): ${message}`
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<label for="type">類型</label>
+	<select name="type" id="type" bind:value={type}>
+		<option value="feat">feat: 新增功能</option>
+		<option value="fix">fix: 修復 bug</option>
+		<option value="refactor">refactor: 重構程式碼</option>
+		<option value="style">style: 更新程式碼風格</option>
+		<option value="docs">docs: 修改文件</option>
+		<option value="chore">chore: 建構輔助工具</option>
+	</select>
+	<label for="scope">範圍 (Jira Issue 編號)</label>
+	<input name="scope" id="scope" bind:value={issueNo} />
+	<label for="message">Commit 訊息</label>
+	<input name="message" id="message" bind:value={message} />
+
+	<h1>這真是史詩般的訊息</h1>
+	<p>{result}</p>
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+		width: 500px;
 	}
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+	input#message {
+		width: 100%;
 	}
 </style>
