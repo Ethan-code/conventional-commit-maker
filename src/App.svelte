@@ -1,4 +1,6 @@
 <script>
+	import Clipboard from "svelte-clipboard";
+
 	let type = 'feat';
 	let issueNo = '';
 	let message = '';
@@ -7,6 +9,7 @@
 </script>
 
 <main>
+	<h1>Conventional Commit Maker</h1>
 	<label for="type">類型</label>
 	<select name="type" id="type" bind:value={type}>
 		<option value="feat">feat: 新增功能</option>
@@ -21,8 +24,16 @@
 	<label for="message">Commit 訊息</label>
 	<input name="message" id="message" bind:value={message} />
 
-	<h1>這真是史詩般的訊息</h1>
-	<p>{result}</p>
+	<h2>Result</h2>
+	<blockquote>{result}</blockquote>
+	<Clipboard
+		text="{result}"
+		let:copy
+		on:copy={() => {
+			alert('已複製到剪貼簿');
+		}}>
+		<button on:click={copy}>複製</button>
+	</Clipboard>
 </main>
 
 <style>

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "sirv-cli": "^2.0.0",
+    "svelte-clipboard": "^1.0.0",
     "water.css": "^2.1.1"
   }
 }
