@@ -1,11 +1,52 @@
 <script>
-	import Clipboard from "svelte-clipboard";
+	import Clipboard from 'svelte-clipboard';
 
 	let type = 'feat';
-	let issueNo = '';
+	let issueNo = 'EMS-';
 	let message = '';
 
-	$: result = `${type}(${issueNo}): ${message}`
+	let openaiToken = '';
+
+	$: result = `${type}(${issueNo}): ${message}`;
+
+	function OpenaiFetchAPI() {
+		console.log('Calling GPT3');
+		var url = 'https://api.openai.com/v1/completions';
+		var bearer = `Bearer ${openaiToken}`;
+
+		if (!openaiToken) {
+			alert('請輸入 OpenAI Token 才可進行翻譯！');
+			return;
+		}
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				Authorization: bearer,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				model: 'text-davinci-003',
+				prompt: `Translate '${message}' to English`,
+				max_tokens: 50,
+				temperature: 0,
+				top_p: 1,
+				n: 1,
+				stream: false,
+				logprobs: null,
+			}),
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				console.log(data);
+				console.log(data['choices'][0].text);
+				message = data['choices'][0].text;
+			})
+			.catch((error) => {
+				console.log('Something bad happened ' + error);
+			});
+	}
 </script>
 
 <main>
@@ -24,14 +65,19 @@
 	<label for="message">Commit 訊息</label>
 	<input name="message" id="message" bind:value={message} />
 
+	<label for="openai-token">OpenAI Token</label>
+	<input name="openai-token" id="openai-token" type="password" bind:value={openaiToken} />
+	<button on:click={OpenaiFetchAPI}>中翻英</button>
+
 	<h2>Result</h2>
 	<blockquote>{result}</blockquote>
 	<Clipboard
-		text="{result}"
+		text={result}
 		let:copy
 		on:copy={() => {
 			alert('已複製到剪貼簿');
-		}}>
+		}}
+	>
 		<button on:click={copy}>複製</button>
 	</Clipboard>
 </main>
@@ -41,7 +87,8 @@
 		width: 500px;
 	}
 
-	input#message {
+	input#message,
+	input#openai-token {
 		width: 100%;
 	}
 </style>
