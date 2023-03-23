@@ -10,9 +10,18 @@
 	$: result = `${type}(${issueNo}): ${message}`;
 
 	function OpenaiFetchAPI() {
-		console.log('Calling GPT3');
-		var url = 'https://api.openai.com/v1/completions';
-		var bearer = `Bearer ${openaiToken}`;
+		console.log('Calling GPT 3.5 Turbo');
+		const url = 'https://api.openai.com/v1/chat/completions';
+		const messages = [
+			{
+				role: 'user',
+				content: `Please output all non proper noun text in lowercase without quotation marks.`,
+			},
+			{
+				role: 'user',
+				content: `Translate the following text into English: ${message}`,
+			},
+		];
 
 		if (!openaiToken) {
 			alert('請輸入 OpenAI Token 才可進行翻譯！');
@@ -21,18 +30,17 @@
 		fetch(url, {
 			method: 'POST',
 			headers: {
-				Authorization: bearer,
+				Authorization: `Bearer ${openaiToken}`,
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				model: 'text-davinci-003',
-				prompt: `Translate '${message}' to English`,
+				model: 'gpt-3.5-turbo',
+				messages,
 				max_tokens: 50,
 				temperature: 0,
 				top_p: 1,
 				n: 1,
 				stream: false,
-				logprobs: null,
 			}),
 		})
 			.then((response) => {
@@ -40,8 +48,7 @@
 			})
 			.then((data) => {
 				console.log(data);
-				console.log(data['choices'][0].text);
-				message = data['choices'][0].text;
+				message = data.choices[0].message.content;
 			})
 			.catch((error) => {
 				console.log('Something bad happened ' + error);
@@ -87,7 +94,7 @@
 		width: 500px;
 		padding: 1.5rem;
 		border-radius: 1em;
-		background-color: #FCFAF2;
+		background-color: #fcfaf2;
 	}
 
 	input#message,
