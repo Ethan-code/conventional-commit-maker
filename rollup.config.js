@@ -5,7 +5,6 @@ import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
-import copy from 'rollup-plugin-copy';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -48,12 +47,6 @@ export default {
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
 		css({ output: 'bundle.css' }),
-		copy({
-			targets: [{
-				src: 'node_modules/water.css/out/light.min.css',
-				dest: 'public/dist/water'
-			}]
-		}),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
