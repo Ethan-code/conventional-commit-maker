@@ -85,10 +85,14 @@
 <style>
 	main {
 		width: 500px;
+		padding: 1.5rem;
+		border-radius: 1em;
+		background-color: #FCFAF2;
 	}
 
 	input#message,
 	input#openai-token {
 		width: 100%;
+		box-sizing: border-box;
 	}
 </style>
