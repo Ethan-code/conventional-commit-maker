@@ -1,5 +1,6 @@
 <script>
 	import Clipboard from 'svelte-clipboard';
+	import { getObjectFromLocalStorage } from './chrome-local-storage-api';
 
 	let type = 'feat';
 	let issueNo = 'EMS-';
@@ -9,8 +10,13 @@
 
 	$: result = `${type}(${issueNo}): ${message}`;
 
-	function OpenaiFetchAPI() {
-		console.log('Calling GPT 3.5 Turbo');
+	async function translateCommitMessageByOpenaiAPI() {
+		openaiToken = await getObjectFromLocalStorage('openaiToken');
+		if (!openaiToken) {
+			alert('Please enter OpenAI token and save!');
+			return;
+		}
+
 		const url = 'https://api.openai.com/v1/chat/completions';
 		const messages = [
 			{
@@ -22,11 +28,6 @@
 				content: `Translate the following text into English: ${message}`,
 			},
 		];
-
-		if (!openaiToken) {
-			alert('請輸入 OpenAI Token 才可進行翻譯！');
-			return;
-		}
 		fetch(url, {
 			method: 'POST',
 			headers: {
@@ -55,6 +56,27 @@
 			});
 	}
 
+	function checkIsExtensionEnv() {
+		if (!chrome) {
+			alert('You are not in Extension Enviroment, Please use this as Extension.');
+			return;
+		}
+	}
+	function saveToken() {
+		checkIsExtensionEnv();
+
+		chrome.storage.local.set({ openaiToken: openaiToken }, (response) => {
+			console.log('set success');
+		});
+	}
+	function removeToken() {
+		checkIsExtensionEnv();
+
+		chrome.storage.local.remove('openaiToken', (response) => {
+			console.log('remove success');
+		});
+	}
+
 	function testSendMessage() {
 		chrome.runtime.sendMessage({ command: 'hello', message: 'hola' }, (response) => {
 			if (!response.success) {
@@ -80,11 +102,13 @@
 	<label for="scope">範圍 (Jira Issue 編號)</label>
 	<input name="scope" id="scope" bind:value={issueNo} />
 	<label for="message">Commit 訊息</label>
+	<button on:click={translateCommitMessageByOpenaiAPI}>中翻英</button>
 	<input name="message" id="message" bind:value={message} />
 
 	<label for="openai-token">OpenAI Token</label>
 	<input name="openai-token" id="openai-token" type="password" bind:value={openaiToken} />
-	<button on:click={OpenaiFetchAPI}>中翻英</button>
+	<button on:click={saveToken}>儲存 Token</button>
+	<button on:click={removeToken}>清除 Token</button>
 	<button on:click={testSendMessage}>訊息傳送測試</button>
 
 	<h2>Result</h2>
