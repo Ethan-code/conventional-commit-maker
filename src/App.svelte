@@ -54,6 +54,16 @@
 				console.log('Something bad happened ' + error);
 			});
 	}
+
+	function testSendMessage() {
+		chrome.runtime.sendMessage({ command: 'hello', message: 'hola' }, (response) => {
+			if (!response.success) {
+				console.log('error sending message', response);
+			} else {
+				console.log('Sucesss ::: ', response.message);
+			}
+		});
+	}
 </script>
 
 <main>
@@ -75,6 +85,7 @@
 	<label for="openai-token">OpenAI Token</label>
 	<input name="openai-token" id="openai-token" type="password" bind:value={openaiToken} />
 	<button on:click={OpenaiFetchAPI}>中翻英</button>
+	<button on:click={testSendMessage}>訊息傳送測試</button>
 
 	<h2>Result</h2>
 	<blockquote>{result}</blockquote>
